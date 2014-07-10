@@ -1,4 +1,5 @@
 box: motemen/golang-goxc@0.0.0
+no-response-timeout: 10
 build:
   steps:
     - setup-go-workspace
