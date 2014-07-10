@@ -1,37 +1,41 @@
 package zenra
 
 import (
+	"github.com/ikawaha/kagome/dic"
 	"github.com/ikawaha/kagome/tokenizer"
-	"log"
 )
 
 // ZENRA phrase
 const ZENRA = "全裸で"
 
 // Zenrize returns zenrized text
-func Zenrize(input string) (result string) {
+func Zenrize(input string) (result string, err error) {
 	t := tokenizer.NewTokenizer()
 	morphs, err := t.Tokenize(input)
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 
 	var verb = false
 	result = ""
 	for i := range morphs {
-		m := morphs[len(morphs)-i-1]
-		c, err := m.Content()
+		var (
+			curr dic.Content
+			prev dic.Content
+		)
+		morph := morphs[len(morphs)-i-1]
+		curr, err = morph.Content()
 		if err != nil {
-			log.Fatal(err)
+			return
 		}
 		if verb {
 			insert := true
-			if c.Pos == "名詞" || c.Pos == "副詞" || c.Pos == "動詞" {
+			if curr.Pos == "名詞" || curr.Pos == "副詞" || curr.Pos == "動詞" {
 				insert = false
-			} else if (c.Pos == "助詞" || c.Pos == "助動詞") && i < len(morphs)-1 {
-				prev, err := morphs[len(morphs)-i-2].Content()
+			} else if (curr.Pos == "助詞" || curr.Pos == "助動詞") && i < len(morphs)-1 {
+				prev, err = morphs[len(morphs)-i-2].Content()
 				if err != nil {
-					log.Fatal(err)
+					return
 				}
 				if prev.Katuyoukei == "連用形" {
 					insert = false
@@ -42,15 +46,15 @@ func Zenrize(input string) (result string) {
 				verb = false
 			}
 		}
-		if c.Pos == "動詞" {
+		if curr.Pos == "動詞" {
 			verb = true
 		}
-		if m.Class != tokenizer.DUMMY {
-			result = m.Surface + result
+		if morph.Class != tokenizer.DUMMY {
+			result = morph.Surface + result
 		}
 	}
 	if verb {
 		result = ZENRA + result
 	}
-	return result
+	return result, nil
 }
