@@ -19,16 +19,8 @@ build:
         name: goxc build & archive
         code: |
           goxc -tasks='xc archive' -bc 'linux windows darwin' -d $WERCKER_OUTPUT_DIR/ -resources-include='README*'
-    - script:
-        name: output release tag
-        code: |
-          git describe --tags --exact --match 'v*' > $WERCKER_OUTPUT_DIR/.release_tag || true
 deploy:
   steps:
-    - script:
-        name: restore release tag
-        code: |
-          export RELEASE_TAG=$(cat .release_tag)
     - wercker/github-create-release:
         token: $GITHUB_TOKEN
         tag: $RELEASE_TAG
