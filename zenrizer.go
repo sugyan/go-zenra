@@ -7,12 +7,22 @@ import (
 // ZENRA phrase
 const ZENRA = "全裸で"
 
-// Zenrize returns zenrized text
-func Zenrize(input string) (result string) {
-	t := tokenizer.New()
-	tokens := t.Tokenize(input)
+// Zenrizer type
+type Zenrizer struct {
+	tokenizer tokenizer.Tokenizer
+}
 
+// NewZenrizer returns Zenrizer instance
+func NewZenrizer() *Zenrizer {
+	return &Zenrizer{
+		tokenizer: tokenizer.New(),
+	}
+}
+
+// Zenrize returns zenrized text
+func (z *Zenrizer) Zenrize(input string) (result string) {
 	var verb = false
+	tokens := z.tokenizer.Tokenize(input)
 	for i := range tokens {
 		// 末尾からさかのぼる
 		token := tokens[len(tokens)-i-1]
