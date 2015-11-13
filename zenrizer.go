@@ -39,7 +39,7 @@ func (z *Zenrizer) Zenrize(input string) (result string) {
 				insert = false
 			} else if (features[0] == "助詞" || features[0] == "助動詞") && i < len(tokens)-1 {
 				prev := tokens[len(tokens)-i-2].Features()
-				if prev[5] == "連用形" {
+				if prev[5] == "連用形" || prev[5] == "連用タ接続" {
 					insert = false
 				}
 			}
