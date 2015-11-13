@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/sugyan/go-zenra.svg?branch=master)](https://travis-ci.org/sugyan/go-zenra)
+
 # go-zenra #
 
 [全裸にする](https://github.com/sugyan/Zenra) Go版
