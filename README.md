@@ -13,6 +13,6 @@
     echo "私は生きている" | zenrize
 
 
-### Notice ###
+### Dependencies ###
 
-This uses [Kagome Japanese Morphological Analyzer](https://github.com/ikawaha/kagome)
+- `github.com/ikawaha/kagome/tokenizer` ([Kagome Japanese Morphological Analyzer](https://github.com/ikawaha/kagome))

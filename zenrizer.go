@@ -1,7 +1,6 @@
 package zenra
 
 import (
-	"github.com/ikawaha/kagome/dic"
 	"github.com/ikawaha/kagome/tokenizer"
 )
 
@@ -9,35 +8,28 @@ import (
 const ZENRA = "全裸で"
 
 // Zenrize returns zenrized text
-func Zenrize(input string) (result string, err error) {
-	t := tokenizer.NewTokenizer()
-	morphs, err := t.Tokenize(input)
-	if err != nil {
-		return
-	}
+func Zenrize(input string) (result string) {
+	t := tokenizer.New()
+	tokens := t.Tokenize(input)
 
 	var verb = false
-	result = ""
-	for i := range morphs {
-		var (
-			curr dic.Content
-			prev dic.Content
-		)
-		morph := morphs[len(morphs)-i-1]
-		curr, err = morph.Content()
-		if err != nil {
-			return
+	for i := range tokens {
+		// 末尾からさかのぼる
+		token := tokens[len(tokens)-i-1]
+		if token.Class == tokenizer.DUMMY {
+			continue
 		}
+		features := token.Features()
+		// フラグが立っていれば「全裸で」を挿入
 		if verb {
 			insert := true
-			if curr.Pos == "名詞" || curr.Pos == "副詞" || curr.Pos == "動詞" {
+			// 名詞／副詞／動詞のときはまだ挿入しない
+			// また、連用形の動詞→助(動)詞の場合も挿入しない
+			if features[0] == "名詞" || features[0] == "副詞" || features[0] == "動詞" {
 				insert = false
-			} else if (curr.Pos == "助詞" || curr.Pos == "助動詞") && i < len(morphs)-1 {
-				prev, err = morphs[len(morphs)-i-2].Content()
-				if err != nil {
-					return
-				}
-				if prev.Katuyoukei == "連用形" {
+			} else if (features[0] == "助詞" || features[0] == "助動詞") && i < len(tokens)-1 {
+				prev := tokens[len(tokens)-i-2].Features()
+				if prev[5] == "連用形" {
 					insert = false
 				}
 			}
@@ -46,15 +38,14 @@ func Zenrize(input string) (result string, err error) {
 				verb = false
 			}
 		}
-		if curr.Pos == "動詞" {
+		// 出力の連結
+		result = token.Surface + result
+		if features[0] == "動詞" {
 			verb = true
-		}
-		if morph.Class != tokenizer.DUMMY {
-			result = morph.Surface + result
 		}
 	}
 	if verb {
 		result = ZENRA + result
 	}
-	return result, nil
+	return result
 }
